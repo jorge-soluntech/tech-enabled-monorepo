@@ -1,0 +1,62 @@
+name: infra del proyecto
+
+on:
+  workflow_dispatch:
+defaults:
+  run:
+    working-directory: infra/
+
+jobs:
+  ecr:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Configure AWS credentials from net account
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_CLOUD }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_CLOUD}}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN_CLOUD }}
+          aws-region: us-east-1
+      - name: Install dependencies and aws cdk
+        run: |
+          sudo npm install -g aws-cdk
+          npm install
+
+  dev:
+    needs: ecr
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Configure AWS credentials from dev account
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_NONPROD }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_NONPROD }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN_NONPROD }}
+          aws-region: us-east-1
+      - name: Install dependencies and aws cdk
+        run: |
+          sudo npm install -g aws-cdk
+          npm install
+
+      - name: Deploy infra lambda
+        env:
+          PRJ_NAME: UserDevLambda
+          PRJ_STACKNAME: UserLambdaStack
+          LAMBDA_DOMAIN_PREFIX: devtest
+          LAMBDA_NAME:  'lambda-test-jorgito'
+          CONN_DTB: "hola"
+
+        run: |
+          PRJ_NAME=${{env.PRJ_NAME}} \
+          PRJ_STACKNAME=${{env.PRJ_STACKNAME}} \
+          REGION=${{ secrets.REGION }} \
+          ACCOUNT_ID=${{ secrets.DEV_ACCOUNT_ID }} \
+          LAMBDA_DOMAIN_PREFIX=${{env.LAMBDA_DOMAIN_PREFIX}} \
+          LAMBDA_NAME=${{env.LAMBDA_NAME}} \
+          CONN_DTB=${{env.CONN_DTB}} \
+
+          cdk deploy ${{ env.PRJ_STACKNAME }} -c config=${{ env.PRJ_NAME }} --require-approval never
+      
+
