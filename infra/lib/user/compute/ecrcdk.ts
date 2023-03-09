@@ -17,7 +17,7 @@ export class InfraEcrCdk extends Stack{
     constructor(scope: Construct, id:string, props?: cdk.StackProps){
         super(scope, id, props)
 
-        if ((process.env.STACK_NAME) && 
+        if ((process.env.PRJ_ECR_NAME) && 
             (process.env.STACK_NAME) &&
             (process.env.ECR_REPOSITORIES)){
             console.log("Desplegando ECR 🧑‍🚀: ", process.env.STACK_NAME)
@@ -40,7 +40,8 @@ export class InfraEcrCdk extends Stack{
 
                 const ecrImages = process.env.ECR_REPOSITORIES.split(',')
                 for (let i = 0; i < ecrImages.length; i++) {
-                    const repository = new ecr.Repository(this, startCase(ecrImages[i].toLocaleLowerCase()) +  'Ecr', {
+                    const repository = new ecr.Repository(this, startCase(process.env.PRJ_ECR_NAME.toLocaleLowerCase()) +  'Ecr', {
+                        repositoryName: ecrImages[i],
                         removalPolicy: RemovalPolicy.DESTROY,
                         imageScanOnPush: true
                     })
