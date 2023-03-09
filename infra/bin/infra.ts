@@ -25,7 +25,7 @@ switch(env) {
     break;
 
   case 'techEnabled':
-    const ecrRepository = new InfraEcrCdk(app, String(process.env.PRJ_ECR_NAME), {
+    const ecrRepository = new InfraEcrCdk(app, String(process.env.STACK_NAME), {
       env: {
         account: process.env.ACCOUNT_ID,
         region: process.env.REGION

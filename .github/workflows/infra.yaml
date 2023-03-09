@@ -50,4 +50,4 @@ jobs:
           PRJ_ECR_NAME=${{ env.PRJ_ECR_NAME }} \
           STACK_NAME=${{ env.STACK_NAME }} \
           ECR_REPOSITORIES=${{ env.ECR_REPOSITORIES }} \
-          cdk deploy ${{ env.PRJ_ECR_NAME }} -c config=${{ env.STACK_NAME }} --require-approval never
+          cdk deploy ${{ env.STACK_NAME }} -c config=${{ env.STACK_NAME }} --require-approval never
