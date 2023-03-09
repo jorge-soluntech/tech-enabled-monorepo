@@ -43,7 +43,7 @@ jobs:
       - name: Deploy ECR 
         env:
           PRJ_ECR_NAME: techenabledClone
-          STACK_NAME: techEnabled
+          STACK_NAME: EcrIscaff
           ECR_REPOSITORIES: scaffm8,scaffm1289
 
         run: |
