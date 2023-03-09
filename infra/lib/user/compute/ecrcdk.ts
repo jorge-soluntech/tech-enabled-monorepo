@@ -8,6 +8,7 @@ import { ArnPrincipal, Effect, PolicyStatement } from 'aws-cdk-lib/aws-iam';
 import {Construct} from "constructs";
 import {startCase} from 'lodash';
 
+import * as elbv2  from 'aws-cdk-lib/aws-elasticloadbalancingv2';
 import * as ecs from 'aws-cdk-lib/aws-ecs';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
 
@@ -79,6 +80,34 @@ export class InfraEcrCdk extends Stack{
                     cluster,
                     taskDefinition
                 });
+
+                // create ALB
+                const lb = new elbv2.ApplicationLoadBalancer(this, 'ALB', {
+                    vpc,
+                    internetFacing: true
+                });
+
+                const listener = lb.addListener('PublicListener', {
+                    port:80,
+                    open:true
+                })
+
+                // atach ALB to ECS Service
+                listener.addTargets('ECS', {
+                    port:3000,
+                    targets: [service.loadBalancerTarget({
+                        containerName: 'web-techenable',
+                        containerPort: 80
+                    })],
+                    // include health check (default is none)
+                    healthCheck: {
+                        interval: cdk.Duration.seconds(60),
+                        path: '/health',
+                        timeout: cdk.Duration.seconds(5),
+                    }
+                });
+
+                new cdk.CfnOutput(this, 'LoadBalancerDNS', {value: lb.loadBalancerDnsName,})
         }   
     }
     
