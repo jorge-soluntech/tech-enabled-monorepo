@@ -42,12 +42,14 @@ jobs:
       
       - name: Deploy ECR 
         env:
+          ECR_CONFIG: techEnabled
           PRJ_ECR_NAME: techenabledClone
           STACK_NAME: EcrIscaff
           ECR_REPOSITORIES: scaffm8,scaffm1289
 
         run: |
+          ECR_CONFIG=${{ env.ECR_CONFIG }} \
           PRJ_ECR_NAME=${{ env.PRJ_ECR_NAME }} \
           STACK_NAME=${{ env.STACK_NAME }} \
           ECR_REPOSITORIES=${{ env.ECR_REPOSITORIES }} \
-          cdk deploy ${{ env.STACK_NAME }} -c config=${{ env.STACK_NAME }} --require-approval never
+          cdk deploy ${{ env.STACK_NAME }} -c config=${{ env.ECR_CONFIG }} --require-approval never
