@@ -37,6 +37,7 @@ export class InfraEcrCdk extends Stack{
                     ]
                 })
 
+                console.log('split de las imagenes: 👊')
                 const ecrImages = process.env.ECR_REPOSITORIES.split(',')
                 for (let i = 0; i < ecrImages.length; i++) {
                     const repository = new ecr.Repository(this, 'EcrTechEnabled'+ [i], {
@@ -52,12 +53,6 @@ export class InfraEcrCdk extends Stack{
                 const vpc = new ec2.Vpc(this, "Vpc", {
                     maxAzs:2
                 });
-
-                const sg = new ec2.SecurityGroup(this, '', {
-                    vpc: vpc,
-                    allowAllIpv6Outbound: true,
-                    allowAllOutbound: true
-                })
 
                 const cluster = new ecs.Cluster(this, 'TechEnabled-cluster', {
                     vpc: vpc
