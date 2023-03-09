@@ -40,7 +40,7 @@ export class InfraEcrCdk extends Stack{
 
                 const ecrImages = process.env.ECR_REPOSITORIES.split(',')
                 for (let i = 0; i < ecrImages.length; i++) {
-                    const repository = new ecr.Repository(this, startCase(process.env.PRJ_ECR_NAME.toLocaleLowerCase()) +  'Ecr', {
+                    const repository = new ecr.Repository(this, 'EcrTechEnabled', {
                         repositoryName: ecrImages[i],
                         removalPolicy: RemovalPolicy.DESTROY,
                         imageScanOnPush: true
