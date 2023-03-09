@@ -18,11 +18,10 @@ export class InfraEcrCdk extends Stack{
         super(scope, id, props)
 
         if ((process.env.PRJ_ECR_NAME) && 
-            (process.env.STACK_NAME) &&
             (process.env.ECR_REPOSITORIES)){
-            console.log("Desplegando ECR 🧑‍🚀: ", process.env.STACK_NAME)
+            console.log("Desplegando ECR 🧑‍🚀: ", process.env.PRJ_ECR_NAME)
                 const ecrPolicyStatement = new PolicyStatement({
-                    sid: process.env.STACK_NAME + 'AllowPushPull',
+                    sid: process.env.PRJ_ECR_NAME + 'AllowPushPull',
                     effect: Effect.ALLOW,
                     principals: [
                         new ArnPrincipal('arn:aws:iam::059704097777:user/cloud_user')
