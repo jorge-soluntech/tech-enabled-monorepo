@@ -49,7 +49,7 @@ export class InfraEcrCdk extends Stack{
                 }
 
                 // create cluster
-                const vpc = new ec2.Vpc(this, "", {
+                const vpc = new ec2.Vpc(this, "Vpc", {
                     maxAzs:2
                 });
 
