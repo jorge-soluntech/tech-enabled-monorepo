@@ -50,6 +50,7 @@ export class InfraEcrCdk extends Stack{
                     repository.addToResourcePolicy(ecrPolicyStatement)
                 }
 
+                /*
                 // create cluster
                 const vpc = new ec2.Vpc(this, "Vpc", {
                     maxAzs:2
@@ -108,6 +109,7 @@ export class InfraEcrCdk extends Stack{
                 });
 
                 new cdk.CfnOutput(this, 'LoadBalancerDNS', {value: lb.loadBalancerDnsName,})
+                */
         }   
     }
     
