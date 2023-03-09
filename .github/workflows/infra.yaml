@@ -44,31 +44,10 @@ jobs:
         env:
           PRJ_ECR_NAME: techenabledClone
           STACK_NAME: techEnabled
-          ECR_REPOSITORIES: scaffm8
+          ECR_REPOSITORIES: scaffm8,scaffm1289
 
         run: |
           PRJ_ECR_NAME=${{ env.PRJ_ECR_NAME }} \
           STACK_NAME=${{ env.STACK_NAME }} \
           ECR_REPOSITORIES=${{ env.ECR_REPOSITORIES }} \
           cdk deploy ${{ env.PRJ_ECR_NAME }} -c config=${{ env.STACK_NAME }} --require-approval never
-      
-      - name: Deploy infra lambda
-        env:
-          PRJ_NAME: UserDevLambda
-          PRJ_STACKNAME: UserLambdaStack
-          LAMBDA_DOMAIN_PREFIX: devtest
-          LAMBDA_NAME:  'lambda-test-jorgito'
-          CONN_DTB: "hola"
-
-        run: |
-          PRJ_NAME=${{env.PRJ_NAME}} \
-          PRJ_STACKNAME=${{env.PRJ_STACKNAME}} \
-          REGION=${{ secrets.REGION }} \
-          ACCOUNT_ID=${{ secrets.DEV_ACCOUNT_ID }} \
-          LAMBDA_DOMAIN_PREFIX=${{env.LAMBDA_DOMAIN_PREFIX}} \
-          LAMBDA_NAME=${{env.LAMBDA_NAME}} \
-          CONN_DTB=${{env.CONN_DTB}} \
-
-          cdk deploy ${{ env.PRJ_STACKNAME }} -c config=${{ env.PRJ_NAME }} --require-approval never
-      
-

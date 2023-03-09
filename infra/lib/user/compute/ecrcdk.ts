@@ -8,6 +8,9 @@ import { ArnPrincipal, Effect, PolicyStatement } from 'aws-cdk-lib/aws-iam';
 import {Construct} from "constructs";
 import {startCase} from 'lodash';
 
+import * as ecs from 'aws-cdk-lib/aws-ecs';
+import * as ec2 from 'aws-cdk-lib/aws-ec2';
+
 
 export class InfraEcrCdk extends Stack{
 
@@ -44,7 +47,38 @@ export class InfraEcrCdk extends Stack{
                     repository.addLifecycleRule( { maxImageCount: 9} );
                     repository.addToResourcePolicy(ecrPolicyStatement)
                 }
-        }
+
+                // create cluster
+                const vpc = new ec2.Vpc(this, "", {
+                    maxAzs:2
+                });
+
+                const cluster = new ecs.Cluster(this, 'TechEnabled-cluster', {
+                    vpc: vpc
+                });
+                cluster.addCapacity('DefaultAutoScalingGroup', {
+                    instanceType: ec2.InstanceType.of(ec2.InstanceClass.T2, ec2.InstanceSize.MICRO)
+                });
+
+                // Create task definition
+                const taskDefinition = new ecs.Ec2TaskDefinition(this, 'tech-enable');
+                const container = taskDefinition.addContainer('web-techenable', {
+                    image: ecs.ContainerImage.fromRegistry('694575695136.dkr.ecr.us-east-1.amazonaws.com/techenabledclone-scaffm8ecr8b1aba35-7wii5qdfvqf2'),
+                    memoryLimitMiB: 256
+                });
+
+                container.addPortMappings({
+                    containerPort:80,
+                    hostPort: 3000,
+                    protocol: ecs.Protocol.TCP
+                });
+
+                // Service
+                const service = new ecs.Ec2Service(this, "service-techenable", {
+                    cluster,
+                    taskDefinition
+                });
+        }   
     }
     
 }
