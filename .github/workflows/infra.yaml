@@ -31,8 +31,8 @@ jobs:
       - name: Configure AWS credentials from dev account
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_NONPROD }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_NONPROD }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_CLOUD }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_CLOUD }}
           aws-session-token: ${{ secrets.AWS_SESSION_TOKEN_NONPROD }}
           aws-region: us-east-1
       - name: Install dependencies and aws cdk
