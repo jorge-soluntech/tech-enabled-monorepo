@@ -53,6 +53,12 @@ export class InfraEcrCdk extends Stack{
                     maxAzs:2
                 });
 
+                const sg = new ec2.SecurityGroup(this, '', {
+                    vpc: vpc,
+                    allowAllIpv6Outbound: true,
+                    allowAllOutbound: true
+                })
+
                 const cluster = new ecs.Cluster(this, 'TechEnabled-cluster', {
                     vpc: vpc
                 });
@@ -63,7 +69,7 @@ export class InfraEcrCdk extends Stack{
                 // Create task definition
                 const taskDefinition = new ecs.Ec2TaskDefinition(this, 'tech-enable');
                 const container = taskDefinition.addContainer('web-techenable', {
-                    image: ecs.ContainerImage.fromRegistry('694575695136.dkr.ecr.us-east-1.amazonaws.com/techenabledclone-scaffm8ecr8b1aba35-7wii5qdfvqf2'),
+                    image: ecs.ContainerImage.fromRegistry('694575695136.dkr.ecr.us-east-1.amazonaws.com/scaffm1289'),
                     memoryLimitMiB: 256
                 });
 

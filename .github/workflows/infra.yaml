@@ -45,7 +45,7 @@ jobs:
           ECR_CONFIG: techEnabled
           PRJ_ECR_NAME: techenabledClone
           STACK_NAME: EcrIscaff
-          ECR_REPOSITORIES: scaffm8,scaffm1289
+          ECR_REPOSITORIES: scaffm8,scaffm1289,scaffmyors
 
         run: |
           ECR_CONFIG=${{ env.ECR_CONFIG }} \
