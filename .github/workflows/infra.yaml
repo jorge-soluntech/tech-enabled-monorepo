@@ -7,7 +7,7 @@ defaults:
     working-directory: infra/
 
 jobs:
-  ecr:
+  ci:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -24,7 +24,7 @@ jobs:
           npm install
 
   dev:
-    needs: ecr
+    needs: ci
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -39,7 +39,19 @@ jobs:
         run: |
           sudo npm install -g aws-cdk
           npm install
+      
+      - name: Deploy ECR 
+        env:
+          PRJ_ECR_NAME: techenabledClone
+          STACK_NAME: techEnabled
+          ECR_REPOSITORIES: scaffm8
 
+        run: |
+          PRJ_ECR_NAME=${{ env.PRJ_ECR_NAME }} \
+          STACK_NAME=${{ env.STACK_NAME }} \
+          ECR_REPOSITORIES=${{ env.ECR_REPOSITORIES }} \
+          cdk deploy ${{ env.PRJ_ECR_NAME }} -c config=${{ env.STACK_NAME }} --require-approval never
+      
       - name: Deploy infra lambda
         env:
           PRJ_NAME: UserDevLambda
