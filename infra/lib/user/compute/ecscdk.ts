@@ -37,7 +37,7 @@ export class InfraECS extends Stack{
 
         container.addPortMappings({
             containerPort:80,
-            hostPort: 3000,
+            hostPort: 8080,
             protocol: ecs.Protocol.TCP
         });
 
@@ -60,7 +60,7 @@ export class InfraECS extends Stack{
 
         // atach ALB to ECS Service
         listener.addTargets('ECS', {
-            port:3000,
+            port:8080,
             targets: [service.loadBalancerTarget({
                 containerName: 'scaffm1289',
                 containerPort: 80
