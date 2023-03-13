@@ -15,14 +15,13 @@ export class InfraECS extends Stack{
     constructor(scope: Construct, id:string, props?: cdk.StackProps){
         super(scope, id, props)
 
-        /*
+        console.log("probemos con esta opcion 🤔")
         
-        
-        const vpc = new ec2.Vpc(this, String(process.env.EC2_VPC + "-Vpc"), {
+        const vpc = new ec2.Vpc(this, String("ec2-prueba-Vpc"), {
             maxAzs:2
         });
 
-        const cluster = new ecs.Cluster(this, String( process.env.ECS_CLUSTER + '-cluster'), {
+        const cluster = new ecs.Cluster(this, String('ECS-cluster'), {
             vpc: vpc
         });
         cluster.addCapacity('DefaultAutoScalingGroup', {
@@ -34,11 +33,16 @@ export class InfraECS extends Stack{
         })
 
         // Create task definition
-        const taskDefinition = new ecs.Ec2TaskDefinition(this, String(process.env.TASK_DENIFITION + '-task'));
+        const taskDefinition = new ecs.Ec2TaskDefinition(this, String(process.env.TASK_DENIFITION + '-task'), {
+            networkMode: ecs.NetworkMode.AWS_VPC,
+        });
+
         const container = taskDefinition.addContainer('scaffm1289', {
             //image: ecs.ContainerImage.fromRegistry('142038508472.dkr.ecr.us-east-1.amazonaws.com/scaffm1289'),
             image: ecs.ContainerImage.fromEcrRepository(ecrRepo),
-            memoryLimitMiB: 256
+            cpu:100,
+            memoryLimitMiB: 512,
+            essential:true
         });
 
         container.addPortMappings({
@@ -47,39 +51,20 @@ export class InfraECS extends Stack{
             protocol: ecs.Protocol.TCP
         });
 
-        // Service
-        const service = new ecs.Ec2Service(this, String(process.env.ECS_SERVICE + "-service"), {
-            cluster,
-            taskDefinition
-        });
-
-        // create ALB
-        const lb = new elbv2.ApplicationLoadBalancer(this, 'ALB', {
+        // create a sg  that allow HTTP trafic on port 80 for our containers without
+        // modifying the sg on the instance
+        const sg = new ec2.SecurityGroup(this, 'sg-ecs-2', {
             vpc,
-            internetFacing: true
-        });
-
-        const listener = lb.addListener('PublicListener', {
-            port:80,
-            open:true
+            allowAllOutbound: false
         })
 
-        // atach ALB to ECS Service
-        listener.addTargets('ECS', {
-            port:8080,
-            targets: [service.loadBalancerTarget({
-                containerName: 'scaffm1289',
-                containerPort: 80
-            })],
-            // include health check (default is none)
-            healthCheck: {
-                interval: cdk.Duration.seconds(60),
-                path: '/health',
-                timeout: cdk.Duration.seconds(5),
-            }
-        });
+        sg.addIngressRule(ec2.Peer.anyIpv4(), ec2.Port.tcp(80))
 
-        new cdk.CfnOutput(this, 'LoadBalancerDNS', {value: lb.loadBalancerDnsName,})
-        */
+        // Service
+        new ecs.Ec2Service(this, String(process.env.ECS_SERVICE + "-service"), {
+            cluster,
+            taskDefinition,
+            securityGroups: [sg],
+        });
     }
 }

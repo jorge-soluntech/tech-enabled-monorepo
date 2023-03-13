@@ -10,7 +10,7 @@ import * as elbv2  from 'aws-cdk-lib/aws-elasticloadbalancingv2';
 import * as ecs from 'aws-cdk-lib/aws-ecs';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
 
-export class InfraEcrCdk extends Stack{
+export class test extends Stack{
 
     constructor(scope: Construct, id:string, props?: cdk.StackProps){
         super(scope, id, props)
@@ -68,19 +68,16 @@ export class InfraEcrCdk extends Stack{
                     repository.addLifecycleRule( { maxImageCount: 9} );
                     repository.addToResourcePolicy(ecrPolicyStatement)
 
-                    console.log("probemos cons task networking 🚀")
-
-                       // Create task definition
-                    const taskDefinition = new ecs.Ec2TaskDefinition(this, String(process.env.TASK_DENIFITION + '-task'), {
-                        networkMode: ecs.NetworkMode.AWS_VPC,
-                    });
-
-                    const container = taskDefinition.addContainer('scaffm1289', {
+                    // Create task definition
+                    const taskDefinition = new ecs.Ec2TaskDefinition(this, String(process.env.TASK_DENIFITION + ' -task'));
+                    const container = taskDefinition.addContainer('scaffm8', {
                         //image: ecs.ContainerImage.fromRegistry('142038508472.dkr.ecr.us-east-1.amazonaws.com/scaffm1289'),
                         image: ecs.ContainerImage.fromEcrRepository(repository),
-                        cpu:100,
+                        containerName:"scaffm8",
                         memoryLimitMiB: 512,
-                        essential:true
+                        environment: {
+                            NODE_ENV:"production",
+                        }
                     });
 
                     container.addPortMappings({
@@ -89,23 +86,41 @@ export class InfraEcrCdk extends Stack{
                         protocol: ecs.Protocol.TCP
                     });
 
-                    // create a sg  that allow HTTP trafic on port 80 for our containers without
-                    // modifying the sg on the instance
-                    const sg = new ec2.SecurityGroup(this, 'sg-ecs-2', {
+                    // Service
+                    const service = new ecs.Ec2Service(this, String(process.env.ECS_SERVICE + "-service"), {
+                        cluster,
+                        taskDefinition
+                    });
+
+                    // create ALB
+                    const lb = new elbv2.ApplicationLoadBalancer(this, 'ALB', {
                         vpc,
-                        allowAllOutbound: false
+                        internetFacing: true
+                    });
+
+                    const listener = lb.addListener('PublicListener', {
+                        port:80,
+                        open:true
                     })
 
-                    sg.addIngressRule(ec2.Peer.anyIpv4(), ec2.Port.tcp(80))
-
-                    // Service
-                    new ecs.Ec2Service(this, String(process.env.ECS_SERVICE + "-service"), {
-                        cluster,
-                        taskDefinition,
-                        securityGroups: [sg],
+                    // atach ALB to ECS Service
+                    listener.addTargets('ECS', {
+                        port:8080,
+                        targets: [service.loadBalancerTarget({
+                            containerName: 'scaffm8',
+                            containerPort: 80
+                        })],
+                        // include health check (default is none)
+                        healthCheck: {
+                            interval: cdk.Duration.seconds(60),
+                            path: '/health',
+                            timeout: cdk.Duration.seconds(5),
+                        }
                     });
-                
-            }
+
+                    new cdk.CfnOutput(this, 'LoadBalancerDNS', {value: lb.loadBalancerDnsName,})
+                    
+                }
         }   
     }
     
