@@ -63,7 +63,9 @@ export class InfraEcrCdk extends Stack{
                     const repository = new ecr.Repository(this, 'EcrTechEnabled'+ [i], {
                         repositoryName: ecrImages[i],
                         removalPolicy: RemovalPolicy.DESTROY,
-                        imageScanOnPush: true
+                        imageScanOnPush: true,
+                        imageTagMutability: ecr.TagMutability.MUTABLE
+
                     })
                     repository.addLifecycleRule( { maxImageCount: 9} );
                     repository.addToResourcePolicy(ecrPolicyStatement)
@@ -75,9 +77,10 @@ export class InfraEcrCdk extends Stack{
                         networkMode: ecs.NetworkMode.AWS_VPC,
                     });
 
-                    const container = taskDefinition.addContainer('scaffm1289', {
+                    const container = taskDefinition.addContainer('nginx', {
                         //image: ecs.ContainerImage.fromRegistry('142038508472.dkr.ecr.us-east-1.amazonaws.com/scaffm1289'),
-                        image: ecs.ContainerImage.fromEcrRepository(repository),
+                        //image: ecs.ContainerImage.fromEcrRepository(repository),
+                        image: ecs.ContainerImage.fromRegistry('nginx:latest'),
                         cpu:100,
                         memoryLimitMiB: 512,
                         essential:true
