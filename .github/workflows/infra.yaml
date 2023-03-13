@@ -45,13 +45,24 @@ jobs:
           ECR_CONFIG: techEnabledEcr
           PRJ_ECR_NAME: techenabledClone
           STACK_NAME: EcrIscaff
-          ECR_REPOSITORIES: scaffm8,scaffm1289,scaffmyors
+          ECR_REPOSITORIES: scaffm8
+          ECS_CLUSTER: TechEnabled
+          ECS_SERVICE: TechEnabled
+          TASK_DENIFITION: TechEnabled
+          EC2_VPC: Ec2-orchestrator
 
         run: |
           ECR_CONFIG=${{ env.ECR_CONFIG }} \
           PRJ_ECR_NAME=${{ env.PRJ_ECR_NAME }} \
           STACK_NAME=${{ env.STACK_NAME }} \
           ECR_REPOSITORIES=${{ env.ECR_REPOSITORIES }} \
+          ECS_CONFIG=${{ env.ECS_CONFIG }} \
+          ECS_STACK_NAME=${{ env.ECS_STACK_NAME }} \
+          ECS_CLUSTER=${{ env.ECS_CLUSTER }} \
+          ECS_SERVICE=${{ env.ECS_SERVICE }} \
+          TASK_DENIFITION=${{ env.TASK_DENIFITION }} \
+          EC2_VPC=${{ env.EC2_VPC }} \
+
           cdk deploy ${{ env.STACK_NAME }} -c config=${{ env.ECR_CONFIG }} --require-approval never
 
       - name: Deploy Ecs, task definition, service

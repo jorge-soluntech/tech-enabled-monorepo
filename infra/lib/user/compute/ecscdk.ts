@@ -15,9 +15,9 @@ export class InfraECS extends Stack{
     constructor(scope: Construct, id:string, props?: cdk.StackProps){
         super(scope, id, props)
 
-
-
         /*
+        
+        
         const vpc = new ec2.Vpc(this, String(process.env.EC2_VPC + "-Vpc"), {
             maxAzs:2
         });
@@ -29,7 +29,6 @@ export class InfraECS extends Stack{
             instanceType: ec2.InstanceType.of(ec2.InstanceClass.T2, ec2.InstanceSize.MICRO)
         });
 
-        // ecr repo
         const ecrRepo = new ecr.Repository(this, '', {
             repositoryName:""
         })
@@ -83,5 +82,4 @@ export class InfraECS extends Stack{
         new cdk.CfnOutput(this, 'LoadBalancerDNS', {value: lb.loadBalancerDnsName,})
         */
     }
-    
 }
