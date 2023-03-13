@@ -15,8 +15,9 @@ export class InfraECS extends Stack{
     constructor(scope: Construct, id:string, props?: cdk.StackProps){
         super(scope, id, props)
 
-        /*
-        const vpc = new ec2.Vpc(this, "Vpc", {
+        console.log('Desplegando servicios ECS 🇨🇦')
+        
+        const vpc = new ec2.Vpc(this, String(process.env.EC2_VPC + "-Vpc"), {
             maxAzs:2
         });
 
@@ -29,8 +30,8 @@ export class InfraECS extends Stack{
 
         // Create task definition
         const taskDefinition = new ecs.Ec2TaskDefinition(this, String(process.env.TASK_DENIFITION + '-task'));
-        const container = taskDefinition.addContainer('web-techenable', {
-            image: ecs.ContainerImage.fromRegistry('694575695136.dkr.ecr.us-east-1.amazonaws.com/scaffm1289'),
+        const container = taskDefinition.addContainer('scaffm1289', {
+            image: ecs.ContainerImage.fromRegistry('142038508472.dkr.ecr.us-east-1.amazonaws.com/scaffm1289'),
             memoryLimitMiB: 256
         });
 
@@ -61,7 +62,7 @@ export class InfraECS extends Stack{
         listener.addTargets('ECS', {
             port:3000,
             targets: [service.loadBalancerTarget({
-                containerName: 'web-techenable',
+                containerName: 'scaffm1289',
                 containerPort: 80
             })],
             // include health check (default is none)
@@ -73,6 +74,6 @@ export class InfraECS extends Stack{
         });
 
         new cdk.CfnOutput(this, 'LoadBalancerDNS', {value: lb.loadBalancerDnsName,})
-*/
+
     }
 }

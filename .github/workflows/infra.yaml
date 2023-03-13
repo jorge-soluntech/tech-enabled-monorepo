@@ -61,7 +61,7 @@ jobs:
           ECS_CLUSTER: TechEnabled
           ECS_SERVICE: TechEnabled
           TASK_DENIFITION: TechEnabled
-          EC2_VPC:
+          EC2_VPC: Ec2-orchestrator
           CONTAINER_NAME:
         run: |
           ECS_CONFIG=${{ env.ECS_CONFIG }}
