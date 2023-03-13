@@ -36,13 +36,14 @@ export class InfraEcrCdk extends Stack{
                 console.log('split de las imagenes: 👊')
                 const ecrImages = process.env.ECR_REPOSITORIES.split(',')
                 for (let i = 0; i < ecrImages.length; i++) {
-                    const repository = new ecr.Repository(this, 'EcrTechEnabled'+ [i], {
+                    const repository = new ecr.Repository(this, 'EcrTechEnabled', {
                         repositoryName: ecrImages[i],
                         removalPolicy: RemovalPolicy.DESTROY,
                         imageScanOnPush: true
                     })
                     repository.addLifecycleRule( { maxImageCount: 9} );
                     repository.addToResourcePolicy(ecrPolicyStatement)
+
                 }
         }   
     }

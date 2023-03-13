@@ -4,7 +4,7 @@ import {
     RemovalPolicy
 } from 'aws-cdk-lib'
 import {Construct} from "constructs";
-
+import * as ecr from 'aws-cdk-lib/aws-ecr';
 import * as elbv2  from 'aws-cdk-lib/aws-elasticloadbalancingv2';
 import * as ecs from 'aws-cdk-lib/aws-ecs';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
@@ -15,8 +15,9 @@ export class InfraECS extends Stack{
     constructor(scope: Construct, id:string, props?: cdk.StackProps){
         super(scope, id, props)
 
-        console.log('Desplegando servicios ECS 🇨🇦')
-        
+
+
+        /*
         const vpc = new ec2.Vpc(this, String(process.env.EC2_VPC + "-Vpc"), {
             maxAzs:2
         });
@@ -28,10 +29,16 @@ export class InfraECS extends Stack{
             instanceType: ec2.InstanceType.of(ec2.InstanceClass.T2, ec2.InstanceSize.MICRO)
         });
 
+        // ecr repo
+        const ecrRepo = new ecr.Repository(this, '', {
+            repositoryName:""
+        })
+
         // Create task definition
         const taskDefinition = new ecs.Ec2TaskDefinition(this, String(process.env.TASK_DENIFITION + '-task'));
         const container = taskDefinition.addContainer('scaffm1289', {
-            image: ecs.ContainerImage.fromRegistry('142038508472.dkr.ecr.us-east-1.amazonaws.com/scaffm1289'),
+            //image: ecs.ContainerImage.fromRegistry('142038508472.dkr.ecr.us-east-1.amazonaws.com/scaffm1289'),
+            image: ecs.ContainerImage.fromEcrRepository(ecrRepo),
             memoryLimitMiB: 256
         });
 
@@ -74,6 +81,7 @@ export class InfraECS extends Stack{
         });
 
         new cdk.CfnOutput(this, 'LoadBalancerDNS', {value: lb.loadBalancerDnsName,})
-
+        */
     }
+    
 }
