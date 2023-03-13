@@ -22,7 +22,7 @@ export class InfraEcrCdk extends Stack{
                     sid: process.env.PRJ_ECR_NAME + 'AllowPushPull',
                     effect: Effect.ALLOW,
                     principals: [
-                        new ArnPrincipal('arn:aws:iam::348190712607:user/cloud_user')
+                        new ArnPrincipal('arn:aws:iam::597993487797:user/cloud_user')
                     ],
                     actions: [
                         'ecr:GetDownloadUrlForLayer',
