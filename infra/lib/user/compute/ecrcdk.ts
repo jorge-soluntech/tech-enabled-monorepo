@@ -85,7 +85,7 @@ export class InfraEcrCdk extends Stack{
 
                     container.addPortMappings({
                         containerPort:80,
-                        hostPort: 8080,
+                        //hostPort: 8080,
                         protocol: ecs.Protocol.TCP
                     });
 
