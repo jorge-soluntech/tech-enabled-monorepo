@@ -43,9 +43,9 @@ jobs:
       - name: Deploy ECR 
         env:
           ECR_CONFIG: techEnabledEcr
-          PRJ_ECR_NAME: techenabledClone
-          STACK_NAME: EcrIscaff
-          ECR_REPOSITORIES: scaffm8
+          PRJ_ECR_NAME: Clone
+          STACK_NAME: TechEnabledComputing
+          ECR_REPOSITORIES: clone1
           ECS_CLUSTER: TechEnabled
           ECS_SERVICE: TechEnabled
           TASK_DENIFITION: TechEnabled
