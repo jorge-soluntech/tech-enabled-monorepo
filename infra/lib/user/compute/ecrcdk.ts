@@ -36,9 +36,20 @@ export class InfraEcrCdk extends Stack{
                 })
 
                 const vpc = new ec2.Vpc(this, String(process.env.EC2_VPC + "-Vpc"), {
+                    subnetConfiguration: [{
+                        subnetType: ec2.SubnetType.PUBLIC,
+                        name: 'Public',
+                    }],
                     maxAzs:2
                 });
-        
+
+                const securityGroup = new ec2.SecurityGroup(this, '', {
+                    vpc,
+                    description: 'Allow ssh access to ec2 instances',
+                    allowAllOutbound: true   // Can be set to false
+                })
+                securityGroup.addIngressRule(ec2.Peer.anyIpv4(), ec2.Port.tcp(22), 'allow ssh access from the world');
+
                 const cluster = new ecs.Cluster(this, String( process.env.ECS_CLUSTER + '-cluster'), {
                     vpc: vpc
                 });
@@ -62,7 +73,7 @@ export class InfraEcrCdk extends Stack{
                     const container = taskDefinition.addContainer('scaffm8', {
                         //image: ecs.ContainerImage.fromRegistry('142038508472.dkr.ecr.us-east-1.amazonaws.com/scaffm1289'),
                         image: ecs.ContainerImage.fromEcrRepository(repository),
-                        memoryLimitMiB: 256
+                        memoryLimitMiB: 256,
                     });
 
                     container.addPortMappings({
