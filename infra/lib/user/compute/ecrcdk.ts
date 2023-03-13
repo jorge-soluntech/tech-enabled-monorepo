@@ -43,7 +43,7 @@ export class InfraEcrCdk extends Stack{
                     maxAzs:2
                 });
 
-                const securityGroup = new ec2.SecurityGroup(this, '', {
+                const securityGroup = new ec2.SecurityGroup(this, 'security-ec2', {
                     vpc,
                     description: 'Allow ssh access to ec2 instances',
                     allowAllOutbound: true   // Can be set to false
