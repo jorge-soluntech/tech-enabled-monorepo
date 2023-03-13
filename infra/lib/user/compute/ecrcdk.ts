@@ -49,19 +49,16 @@ export class InfraEcrCdk extends Stack{
                     repository.addToResourcePolicy(ecrPolicyStatement)
                 }
 
-                const app = new cdk.App();
-                const stack = new cdk.Stack(app, 'ec2-service-with-task-networking');
-
                 // Create the cluster
-                const vpc = new ec2.Vpc(stack, 'Vpc', { maxAzs: 2 });
+                const vpc = new ec2.Vpc(this, 'Vpc', { maxAzs: 2 });
 
-                const cluster = new ecs.Cluster(stack, 'awsvpc-ecs-demo-cluster', { vpc });
+                const cluster = new ecs.Cluster(this, 'awsvpc-ecs-demo-cluster', { vpc });
                 cluster.addCapacity('DefaultAutoScalingGroup', {
                 instanceType: ec2.InstanceType.of(ec2.InstanceClass.T2, ec2.InstanceSize.MICRO)
                 });
 
                 // Create a task definition with its own elastic network interface
-                const taskDefinition = new ecs.Ec2TaskDefinition(stack, 'nginx-awspvc', {
+                const taskDefinition = new ecs.Ec2TaskDefinition(this, 'nginx-awspvc', {
                 networkMode: ecs.NetworkMode.AWS_VPC,
                 });
 
@@ -78,7 +75,7 @@ export class InfraEcrCdk extends Stack{
                 });
 
                 // Create a security group that allows HTTP traffic on port 80 for our containers without modifying the security group on the instance
-                const securityGroup = new ec2.SecurityGroup(stack, 'nginx--7623', {
+                const securityGroup = new ec2.SecurityGroup(this, 'nginx--7623', {
                 vpc,
                 allowAllOutbound: false,
                 });
@@ -86,7 +83,7 @@ export class InfraEcrCdk extends Stack{
                 securityGroup.addIngressRule(ec2.Peer.anyIpv4(), ec2.Port.tcp(80));
 
                 // Create the service
-                new ecs.Ec2Service(stack, 'awsvpc-ecs-demo-service', {
+                new ecs.Ec2Service(this, 'awsvpc-ecs-demo-service', {
                 cluster,
                 taskDefinition,
                 securityGroups: [securityGroup],
