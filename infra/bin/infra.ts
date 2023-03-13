@@ -3,12 +3,13 @@ import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
 import {UserServerless} from '../lib/user/serverless/serverless'
 import {InfraEcrCdk} from '../lib/user/compute/ecrcdk'
+import {InfraECS} from '../lib/user/compute/ecscdk'
 import { Construct } from 'constructs';
 import { InfraStack } from '../lib/infra-stack';
 
 const app = new cdk.App();
 
-//new InfraStack(app, "InfraStack", {})
+new InfraStack(app, "InfraStack", {})
 
 let env = app.node.tryGetContext('config')
 console.log("entramos a la iac: ", env)
@@ -24,7 +25,7 @@ switch(env) {
     taggingStack(userLambda, 'pc-1', 'usuarios', 'dev', 'cc-0001203', 'na', 'na')
     break;
 
-  case 'techEnabled':
+  case 'techEnabledEcr':
     const ecrRepository = new InfraEcrCdk(app, String(process.env.STACK_NAME), {
       env: {
         account: process.env.ACCOUNT_ID,
@@ -32,6 +33,18 @@ switch(env) {
       }
     })
     taggingStack(ecrRepository, 'pc-1', 'usuarios', 'dev', 'cc-0001203', 'na', 'na')
+    break;
+
+  case  'techEnableECS':
+    console.log('despleguemos ecs 🚀')
+    const ecsTechEnable = new InfraECS(app, String(process.env.ECS_STACK_NAME), {
+      env: {
+        account: process.env.ACCOUNT_ID,
+        region: process.env.REGION
+      }
+    });
+
+    taggingStack(ecsTechEnable, 'pc-1', 'usuarios', 'dev', 'cc-0001203', 'na', 'na')
     break;
 }
 
