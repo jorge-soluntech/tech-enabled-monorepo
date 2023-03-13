@@ -35,28 +35,6 @@ export class InfraEcrCdk extends Stack{
                     ]
                 })
 
-                const vpc = new ec2.Vpc(this, String(process.env.EC2_VPC + "-Vpc"), {
-                    subnetConfiguration: [{
-                        subnetType: ec2.SubnetType.PUBLIC,
-                        name: 'Public',
-                    }],
-                    maxAzs:2
-                });
-
-                const securityGroup = new ec2.SecurityGroup(this, 'security-ec2', {
-                    vpc,
-                    description: 'Allow ssh access to ec2 instances',
-                    allowAllOutbound: true   // Can be set to false
-                })
-                securityGroup.addIngressRule(ec2.Peer.anyIpv4(), ec2.Port.tcp(22), 'allow ssh access from the world');
-
-                const cluster = new ecs.Cluster(this, String( process.env.ECS_CLUSTER + '-cluster'), {
-                    vpc: vpc
-                });
-                cluster.addCapacity('DefaultAutoScalingGroup', {
-                    instanceType: ec2.InstanceType.of(ec2.InstanceClass.T2, ec2.InstanceSize.MICRO)
-                });
-
                 console.log('split de las imagenes: 👊')
                 const ecrImages = process.env.ECR_REPOSITORIES.split(',')
                 for (let i = 0; i < ecrImages.length; i++) {
@@ -69,46 +47,52 @@ export class InfraEcrCdk extends Stack{
                     })
                     repository.addLifecycleRule( { maxImageCount: 9} );
                     repository.addToResourcePolicy(ecrPolicyStatement)
+                }
 
-                    console.log("probemos cons task networking 🚀")
+                const app = new cdk.App();
+                const stack = new cdk.Stack(app, 'ec2-service-with-task-networking');
 
-                       // Create task definition
-                    const taskDefinition = new ecs.Ec2TaskDefinition(this, String(process.env.TASK_DENIFITION + '-task'), {
-                        networkMode: ecs.NetworkMode.AWS_VPC,
-                    });
+                // Create the cluster
+                const vpc = new ec2.Vpc(stack, 'Vpc', { maxAzs: 2 });
 
-                    const container = taskDefinition.addContainer('nginx', {
-                        //image: ecs.ContainerImage.fromRegistry('142038508472.dkr.ecr.us-east-1.amazonaws.com/scaffm1289'),
-                        //image: ecs.ContainerImage.fromEcrRepository(repository),
-                        image: ecs.ContainerImage.fromRegistry('nginx:latest'),
-                        cpu:100,
-                        memoryLimitMiB: 512,
-                        essential:true
-                    });
+                const cluster = new ecs.Cluster(stack, 'awsvpc-ecs-demo-cluster', { vpc });
+                cluster.addCapacity('DefaultAutoScalingGroup', {
+                instanceType: ec2.InstanceType.of(ec2.InstanceClass.T2, ec2.InstanceSize.MICRO)
+                });
 
-                    container.addPortMappings({
-                        containerPort:80,
-                        //hostPort: 8080,
-                        protocol: ecs.Protocol.TCP
-                    });
+                // Create a task definition with its own elastic network interface
+                const taskDefinition = new ecs.Ec2TaskDefinition(stack, 'nginx-awspvc', {
+                networkMode: ecs.NetworkMode.AWS_VPC,
+                });
 
-                    // create a sg  that allow HTTP trafic on port 80 for our containers without
-                    // modifying the sg on the instance
-                    const sg = new ec2.SecurityGroup(this, 'sg-ecs-2', {
-                        vpc,
-                        allowAllOutbound: false
-                    })
+                const webContainer = taskDefinition.addContainer('nginx', {
+                image: ecs.ContainerImage.fromRegistry('nginx:latest'),
+                cpu: 100,
+                memoryLimitMiB: 256,
+                essential: true,
+                });
 
-                    sg.addIngressRule(ec2.Peer.anyIpv4(), ec2.Port.tcp(80))
+                webContainer.addPortMappings({
+                containerPort: 80,
+                protocol: ecs.Protocol.TCP,
+                });
 
-                    // Service
-                    new ecs.Ec2Service(this, String(process.env.ECS_SERVICE + "-service"), {
-                        cluster,
-                        taskDefinition,
-                        securityGroups: [sg],
-                    });
-                
-            }
+                // Create a security group that allows HTTP traffic on port 80 for our containers without modifying the security group on the instance
+                const securityGroup = new ec2.SecurityGroup(stack, 'nginx--7623', {
+                vpc,
+                allowAllOutbound: false,
+                });
+
+                securityGroup.addIngressRule(ec2.Peer.anyIpv4(), ec2.Port.tcp(80));
+
+                // Create the service
+                new ecs.Ec2Service(stack, 'awsvpc-ecs-demo-service', {
+                cluster,
+                taskDefinition,
+                securityGroups: [securityGroup],
+                });
+
+
         }   
     }
     
