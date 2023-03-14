@@ -4,6 +4,7 @@ import * as cdk from 'aws-cdk-lib';
 import {UserServerless} from '../lib/user/serverless/serverless'
 import {InfraEcrCdk} from '../lib/user/compute/ecrcdk'
 import {InfraECS} from '../lib/user/compute/ecscdk'
+import {InfrastructureStack} from '../lib/user/compute/infraestructure' 
 import { Construct } from 'constructs';
 import { InfraStack } from '../lib/infra-stack';
 
@@ -45,6 +46,16 @@ switch(env) {
     });
 
     taggingStack(ecsTechEnable, 'pc-1', 'usuarios', 'dev', 'cc-0001203', 'na', 'na')
+    break;
+
+  case 'infraestructureIAC':
+    const infra = new InfrastructureStack(app, String(process.env.INFRA_STACK_NAME), {
+      env: {
+        account: process.env.ACCOUNT_ID,
+        region: process.env.REGION
+      }
+    })
+    taggingStack(infra, 'pc-1', 'usuarios', 'dev', 'cc-0001203', 'na', 'na')
     break;
 }
 

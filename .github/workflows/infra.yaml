@@ -65,4 +65,13 @@ jobs:
 
           cdk deploy ${{ env.STACK_NAME }} -c config=${{ env.ECR_CONFIG }} --require-approval never
 
+      - name: Deploy Infra iac
+        env:
+          INFRA_STACK_NAME: 
+          INFRA_CONFIG: infraestructureIAC
+        run: |
+          INFRA_STACK_NAME=${{ env.INFRA_STACK_NAME }}
+          INFRA_CONFIG=${{ env.INFRA_CONFIG }}
+          cdk deploy ${{ env.INFRA_STACK_NAME }} -c config=${{ env.INFRA_CONFIG }} --require-approval never
+
    
