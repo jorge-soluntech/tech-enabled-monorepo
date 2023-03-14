@@ -67,7 +67,7 @@ jobs:
 
       - name: Deploy Infra iac
         env:
-          INFRA_STACK_NAME: 
+          INFRA_STACK_NAME: infra
           INFRA_CONFIG: infraestructureIAC
         run: |
           INFRA_STACK_NAME=${{ env.INFRA_STACK_NAME }}
